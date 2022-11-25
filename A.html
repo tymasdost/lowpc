@@ -1,0 +1,102 @@
+<html>
+<meta charset="UTF-8" />
+<p>
+    Níže nahraj vstupní soubor, šablona ho načte, spustí na něm tvé řešení a stáhne výstupní soubor. Řešení napíšeš tak, že tento soubor otevřeš v textovém editoru a upravíš funkci
+    <code>spocitej_vysledek</code>.
+</p>
+
+<form>
+    <input type="file" id="files" name="file" />
+    <input type="button" value="Spusti" onclick="spusti();" />
+</form>
+
+<script>
+    function spocitejVysledek(
+        kytky,
+        pocet
+    ) {
+        let answer = "";
+        let ans = [];
+        let ans2 = [];
+        let i = 0;
+        while (kytky.length > 0) {
+
+            temp = kytky[0];
+            ans[i] = temp;
+            ans2[i] = pocet[0];
+            pocet.shift();
+            kytky.shift();
+            while (kytky.includes(temp)) {
+                ans2[i] += pocet[kytky.indexOf(temp)];
+                pocet.splice(kytky.indexOf(temp), 1);
+                kytky.splice(kytky.indexOf(temp), 1);
+
+            }
+            i++;
+        }
+        answer += `${ans.length}\n`;
+        for (let i = 0; i < ans.length - 1; i++) {
+            answer += `${ans[i]} ${ans2[i]}\n`;
+        }
+        answer += `${ans[ans.length -1]} ${ans2[ans.length - 1]}`;
+        return answer;
+    }
+    var reader;
+    reader = new FileReader();
+    reader.onerror = function(e) {
+        alert("Nastala chyba při čtení ze souboru.!");
+    };
+    reader.onload = function(e) {
+        stahniText(main(reader.result));
+    };
+
+    function stahniText(text) {
+        var element = document.createElement("a");
+        element.setAttribute(
+            "href",
+            "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+        );
+        element.setAttribute("download", "A-vysledek.txt");
+        element.style.display = "none";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    function spusti() {
+        reader.readAsText(document.getElementById("files").files[0]);
+    }
+
+    function main(vstup) {
+        const radky = vstup.split("\n");
+        let vystup = "";
+        const T = parseInt(radky[0]);
+
+        let radekIdx = 1;
+
+        function getRadek() {
+            return radky[radekIdx++];
+        }
+
+        for (let i = 1; i <= T; i++) {
+            let kytky = [];
+            let pocet = [];
+
+            const n = parseInt(getRadek());
+            for (let j = 0; j < n; j++) {
+                const temp = getRadek().split(' ');
+                kytky.push(temp[0]);
+                pocet.push(parseInt(temp[1]));
+            }
+
+            vystup +=
+                spocitejVysledek(
+                    kytky,
+                    pocet
+                ) + "\n";
+        }
+        return vystup;
+    }
+</script>
+
+</html>
